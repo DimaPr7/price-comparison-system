@@ -1,10 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <title>Kainos24 Clone</title>
 </head>
 <body>
-$END$
+
+{% if user.is_authenticated %}
+    <p>Привет, <b>{{ user.username }}</b> 👋</p>
+
+    <a href="/logout/">Выйти</a>
+{% else %}
+    <a href="/accounts/login/">Войти</a> |
+    <a href="/register/">Регистрация</a>
+{% endif %}
+<hr>
+
+<h3>Главная страница проекта</h3>
+<p>Здесь скоро будут товары и сравнение цен 🔥</p>
+
 </body>
 </html>
