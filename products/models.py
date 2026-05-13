@@ -29,7 +29,7 @@ class Product(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     brand = models.CharField(max_length=255, blank=True)
-
+    url = models.URLField(blank=True)
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
@@ -52,30 +52,24 @@ class Store(models.Model):
     def __str__(self):
         return self.name
 
-class Price(models.Model):
-    product = models.ForeignKey(
-        Product,
-        on_delete=models.CASCADE,
-        related_name='prices'
-    )
-
-    store = models.ForeignKey(
-        Store,
-        on_delete=models.CASCADE,
-        related_name='prices'
-    )
-
-    price = models.DecimalField(max_digits=10, decimal_places=2)
-    currency = models.CharField(max_length=10, default='EUR')
-    url = models.URLField(blank=True)
-
-    updated_at = models.DateTimeField(auto_now=True)
+class ProductOffer(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="offers")
+    store = models.ForeignKey(Store, on_delete=models.CASCADE, related_name="offers")
+    url = models.URLField()
 
     class Meta:
         unique_together = ('product', 'store')
 
     def __str__(self):
-        return f"{self.product.title} - {self.store.name}: {self.price}"
+        return f"{self.product.title} @ {self.store.name}"
+
+class Price(models.Model):
+    offer = models.ForeignKey(ProductOffer, on_delete=models.CASCADE, related_name='prices')
+
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    currency = models.CharField(max_length=10, default='EUR')
+
+    updated_at = models.DateTimeField(auto_now=True)
 
 class Favorite(models.Model):
     user = models.ForeignKey(
