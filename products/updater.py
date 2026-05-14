@@ -4,19 +4,17 @@ from django.core.management import call_command
 
 
 def run_price_parser_job():
-    print(f"[{datetime.now()}] Автоматический запуск парсера цен (интервал: 12 часов)...")
+    print(f"[{datetime.now()}] Automatic price parser run (interval: 12 hours)...")
     try:
-        # Программно вызываем вашу Django-команду parse_prices
         call_command("parse_prices")
     except Exception as e:
-        print(f"[!] Ошибка при выполнении автоматического парсинга: {e}")
+        print(f"[!] Error during automatic parsing: {e}")
 
 
 def start():
     scheduler = BackgroundScheduler()
 
-    # Настройка запуска каждые 12 часов
-    scheduler.add_job(run_price_parser_job, 'interval', hours=12)
+    scheduler.add_job(run_price_parser_job, "interval", hours=12)
 
     scheduler.start()
-    print("[*] Фоновый планировщик цен успешно запущен. Интервал: каждые 12 часов.")
+    print("[*] Price scheduler started successfully. Interval: 12 hours.")

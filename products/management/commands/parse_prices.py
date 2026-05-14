@@ -7,7 +7,7 @@ from django.utils import timezone
 from datetime import timedelta
 from playwright.sync_api import sync_playwright
 
-from products.models import Price, ProductOffer, PriceHistory
+from products.models import ProductOffer, PriceHistory
 from products.parsers.registry import get_parser_for_store
 
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
@@ -64,44 +64,12 @@ class Command(BaseCommand):
                 soup = BeautifulSoup(html, "html.parser")
                 price = parser.extract_price(soup)
 
+                context.close()
+
                 if price is None:
                     self.stdout.write(f"Price not found for {product.title} @ {store.name}")
-                    context.close()
                     continue
 
-                # -----------------------
-                # CURRENT PRICE (FIXED)
-                # -----------------------
-                current_price, created = Price.objects.get_or_create(
-                    offer=offer,
-                    defaults={
-                        "price": price,
-                        "currency": "EUR",
-                    },
-                )
-
-                if not created and float(current_price.price) != float(price):
-                    old_price = current_price.price
-                    current_price.price = price
-                    current_price.save()
-
-                    self.stdout.write(
-                        self.style.SUCCESS(
-                            f"[UPDATED] {product.title}: {old_price}€ → {price}€"
-                        )
-                    )
-
-                elif created:
-                    self.stdout.write(
-                        self.style.SUCCESS(f"[NEW] {product.title} → {price}€")
-                    )
-
-                else:
-                    self.stdout.write(f"[NO CHANGE] {product.title} → {price}€")
-
-                # -----------------------
-                # HISTORY (FIXED, ONLY OFFER)
-                # -----------------------
                 last_history = PriceHistory.objects.filter(
                     offer=offer
                 ).order_by("-recorded_at").first()
@@ -120,10 +88,16 @@ class Command(BaseCommand):
                         offer=offer,
                         price=price
                     )
+                    self.stdout.write(
+                        self.style.SUCCESS(
+                            f"[UPDATED] {product.title} @ {store.name} → {price}€"
+                        )
+                    )
+                else:
+                    self.stdout.write(
+                        f"[NO CHANGE] {product.title} @ {store.name} → {price}€"
+                    )
 
-                self.stdout.write(f"{product.title} @ {store.name} → {price}€")
-
-                context.close()
                 time.sleep(random.uniform(1.5, 3.0))
 
             browser.close()

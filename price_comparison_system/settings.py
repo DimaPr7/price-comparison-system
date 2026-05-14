@@ -26,7 +26,8 @@ SECRET_KEY = 'django-insecure-29l)%h66q4=3l0u@iy3d@mwysid7&d1n+zg(k*=y1m^@wj0hik
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 # Application definition
