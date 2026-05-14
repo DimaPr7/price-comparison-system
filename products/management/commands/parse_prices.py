@@ -3,8 +3,11 @@ import random
 import time
 from bs4 import BeautifulSoup
 from django.core.management.base import BaseCommand
+from django.utils import timezone
+from datetime import timedelta
 from playwright.sync_api import sync_playwright
-from products.models import Price, ProductOffer
+
+from products.models import Price, ProductOffer, PriceHistory
 from products.parsers.registry import get_parser_for_store
 
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
@@ -30,9 +33,9 @@ class Command(BaseCommand):
             browser = p.chromium.launch(headless=True)
 
             for offer in offers:
-                url = offer.url
                 product = offer.product
                 store = offer.store
+                url = offer.url
 
                 if not url:
                     self.stdout.write(f"Skip {product.title}: no URL")
@@ -40,9 +43,7 @@ class Command(BaseCommand):
 
                 parser = get_parser_for_store(store.name)
                 if not parser:
-                    self.stdout.write(
-                        f"Skip {product.title}: no parser implemented for store '{store.name}'"
-                    )
+                    self.stdout.write(f"Skip {product.title}: no parser for {store.name}")
                     continue
 
                 context = browser.new_context(
@@ -56,9 +57,7 @@ class Command(BaseCommand):
                     page.wait_for_timeout(4000)
                     html = page.content()
                 except Exception as e:
-                    self.stdout.write(
-                        f"Error loading {product.title} from {store.name}: {e}"
-                    )
+                    self.stdout.write(f"Error loading {product.title}: {e}")
                     context.close()
                     continue
 
@@ -66,19 +65,63 @@ class Command(BaseCommand):
                 price = parser.extract_price(soup)
 
                 if price is None:
-                    self.stdout.write(
-                        f"Price not found for {product.title} @ {store.name}"
-                    )
+                    self.stdout.write(f"Price not found for {product.title} @ {store.name}")
                     context.close()
                     continue
 
-                Price.objects.update_or_create(
-                    offer=offer, defaults={"price": price, "currency": "EUR"}
+                # -----------------------
+                # CURRENT PRICE (FIXED)
+                # -----------------------
+                current_price, created = Price.objects.get_or_create(
+                    offer=offer,
+                    defaults={
+                        "price": price,
+                        "currency": "EUR",
+                    },
                 )
 
-                self.stdout.write(
-                    self.style.SUCCESS(f"{product.title} @ {store.name} → {price}€")
-                )
+                if not created and float(current_price.price) != float(price):
+                    old_price = current_price.price
+                    current_price.price = price
+                    current_price.save()
+
+                    self.stdout.write(
+                        self.style.SUCCESS(
+                            f"[UPDATED] {product.title}: {old_price}€ → {price}€"
+                        )
+                    )
+
+                elif created:
+                    self.stdout.write(
+                        self.style.SUCCESS(f"[NEW] {product.title} → {price}€")
+                    )
+
+                else:
+                    self.stdout.write(f"[NO CHANGE] {product.title} → {price}€")
+
+                # -----------------------
+                # HISTORY (FIXED, ONLY OFFER)
+                # -----------------------
+                last_history = PriceHistory.objects.filter(
+                    offer=offer
+                ).order_by("-recorded_at").first()
+
+                should_save = False
+
+                if not last_history:
+                    should_save = True
+                else:
+                    price_changed = float(last_history.price) != float(price)
+                    time_passed = timezone.now() - last_history.recorded_at > timedelta(hours=6)
+                    should_save = price_changed or time_passed
+
+                if should_save:
+                    PriceHistory.objects.create(
+                        offer=offer,
+                        price=price
+                    )
+
+                self.stdout.write(f"{product.title} @ {store.name} → {price}€")
 
                 context.close()
                 time.sleep(random.uniform(1.5, 3.0))

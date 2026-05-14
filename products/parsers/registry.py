@@ -1,6 +1,8 @@
 from .base import BaseProductParser
+from .bite import BiteParser
 from .pigu import PiguParser
 from .senukai import SenukaiParser
+from .telia import TeliaParser  # Добавляем импорт нового парсера
 
 _PARSERS_REGISTRY = {
     "Pigu": PiguParser(),
@@ -8,6 +10,13 @@ _PARSERS_REGISTRY = {
     "Senukai": SenukaiParser(),
     "senukai": SenukaiParser(),
     "Senukai.lt": SenukaiParser(),
+    "Bite": BiteParser(),
+    "bite": BiteParser(),
+    "Bite.lt": BiteParser(),
+    # Добавляем ключи для Telia
+    "Telia": TeliaParser(),
+    "telia": TeliaParser(),
+    "Telia.lt": TeliaParser(),
 }
 
 
