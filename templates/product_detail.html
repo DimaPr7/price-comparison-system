@@ -1,162 +1,163 @@
 {% extends "base.html" %}
 
-{% block content %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ product.title }} — Kainos24 Clone</title>
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
 
-    <link href="googleapis.com" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% block extra_css %}
+<style>
+    .container {
+        max-width: 1100px;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        padding: 0 20px 40px;
+        margin-top: 20px;
+    }
 
-    <style>
-        :root {
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --bg-body: #f8fafc;
-            --bg-card: #ffffff;
-            --border: #e2e8f0;
-            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
-            --radius: 12px;
-            --navbar-height: 70px;
-        }
+    .product-main {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 24px;
+    }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-body);
-            color: var(--text-main);
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+    .card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 24px;
+    }
 
-        .navbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: var(--navbar-height);
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            padding: 0 20px;
-        }
+    .product-gallery {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 320px;
+    }
 
-        .container {
-            max-width: 1100px;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
-            margin-top: calc(var(--navbar-height) + 30px);
-            padding: 0 20px;
-        }
+    .product-image {
+        max-width: 100%;
+        max-height: 340px;
+        object-fit: contain;
+    }
 
+    h1 {
+        margin: 0 0 10px;
+        font-size: 2rem;
+    }
+
+    .brand {
+        color: var(--primary);
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-bottom: 12px;
+    }
+
+    .description {
+        color: var(--text-muted);
+        line-height: 1.6;
+        margin-bottom: 26px;
+    }
+
+    .offers-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .offers-list li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px;
+        background: #f8fafc;
+        border: 1px solid #eef2f7;
+        border-radius: 10px;
+    }
+
+    .offer-info {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .price-tag {
+        background: #dcfce7;
+        color: #15803d;
+        padding: 5px 10px;
+        border-radius: 7px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .no-price {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+
+    .offer-button {
+        background: var(--primary);
+        color: white;
+        padding: 8px 14px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .offer-button:hover {
+        background: var(--primary-hover);
+    }
+
+    .chart-container {
+        height: 400px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        padding: 14px;
+        border-bottom: 1px solid var(--border);
+        text-align: left;
+    }
+
+    th {
+        background: #f8fafc;
+        font-weight: 600;
+    }
+
+    tr:hover td {
+        background: #fafcff;
+    }
+
+    @media (max-width: 900px) {
         .product-main {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 30px;
-        }
-
-        .card {
-            background: var(--bg-card);
-            border-radius: var(--radius);
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow);
-            padding: 30px;
-        }
-
-        .product-gallery {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 300px;
-        }
-
-        .product-image {
-            max-width: 100%;
-            max-height: 350px;
-            object-fit: contain;
-        }
-
-        h1 {
-            margin: 0 0 10px;
-        }
-
-        .brand {
-            color: var(--primary);
-            font-weight: 700;
-            text-transform: uppercase;
-            font-size: 0.8rem;
-        }
-
-        .description {
-            color: var(--text-muted);
-            margin-bottom: 20px;
-        }
-
-        .offers-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+            grid-template-columns: 1fr;
         }
 
         .offers-list li {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px;
-            background: #f1f5f9;
-            border-radius: 8px;
+            flex-direction: column;
+            align-items: flex-start;
         }
 
-        .price-tag {
-            font-weight: 700;
-            color: #16a34a;
-            background: #dcfce7;
-            padding: 4px 10px;
-            border-radius: 6px;
-        }
-
-        .no-price {
-            color: var(--text-muted);
-        }
-
-        .chart-container {
-            height: 400px;
-        }
-
-        table {
+        .offer-button {
             width: 100%;
-            border-collapse: collapse;
+            text-align: center;
         }
+    }
+</style>
+{% endblock %}
 
-        th, td {
-            padding: 12px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        th {
-            background: #f8fafc;
-            text-align: left;
-        }
-    </style>
-</head>
-
-<body>
-
+{% block content %}
 
 <div class="container">
 
@@ -164,46 +165,74 @@
 
         <div class="card product-gallery">
             {% if product.image %}
-    <img class="product-image" src="{{ product.image.url }}">
-{% else %}
-    <span>No image</span>
-{% endif %}
+                <img class="product-image" src="{{ product.image.url }}" alt="{{ product.title }}">
+            {% else %}
+                <span>No image</span>
+            {% endif %}
         </div>
 
         <div class="card">
+
             <p class="brand">{{ product.brand }}</p>
+
             <h1>{{ product.title }}</h1>
+
             <p class="description">{{ product.description }}</p>
 
             <h2>💰 Current Prices</h2>
 
             <ul class="offers-list">
+
                 {% for offer in offers %}
                     <li>
-                        <span>{{ offer.store.name }}</span>
 
-                        {% if offer.last_price %}
-                            <span class="price-tag">{{ offer.last_price|floatformat:2 }} €</span>
-                        {% else %}
-                            <span class="no-price">out of stock</span>
+                        <div class="offer-info">
+                            <span>{{ offer.store.name }}</span>
+
+                            {% if offer.last_price %}
+                                <span class="price-tag">
+                                    {{ offer.last_price|floatformat:2 }} €
+                                </span>
+                            {% else %}
+                                <span class="no-price">Out of stock</span>
+                            {% endif %}
+                        </div>
+
+                        {% if offer.url %}
+                            <a href="{{ offer.url }}" target="_blank" class="offer-button">
+                                Open offer
+                            </a>
                         {% endif %}
+
                     </li>
                 {% endfor %}
+
             </ul>
+
+            <a href="{% url 'add_to_favorites' product.id %}" class="offer-button" style="margin-top:15px; display:inline-block;">
+                ❤️ Add to favorites
+            </a>
+
         </div>
 
     </div>
 
     <div class="card">
+
         <h2>📈 Price history chart</h2>
+
         <div class="chart-container">
             <canvas id="priceChart"></canvas>
         </div>
+
     </div>
 
     <div class="card">
+
         <h2>📊 History</h2>
+
         <table>
+
             <thead>
                 <tr>
                     <th>Store</th>
@@ -211,34 +240,35 @@
                     <th>Date</th>
                 </tr>
             </thead>
+
             <tbody>
                 {% for h in history %}
-                <tr>
-                    <td>{{ h.offer.store.name }}</td>
-                    <td>{{ h.price }} €</td>
-                    <td>{{ h.recorded_at }}</td>
-                </tr>
+                    <tr>
+                        <td>{{ h.offer.store.name }}</td>
+                        <td>{{ h.price }} €</td>
+                        <td>{{ h.recorded_at }}</td>
+                    </tr>
                 {% endfor %}
             </tbody>
+
         </table>
+
     </div>
 
 </div>
 
 <script>
-const labels = JSON.parse('{{ chart_labels|escapejs }}');
-const datasets = JSON.parse('{{ chart_datasets|escapejs }}');
+    const labels = JSON.parse('{{ chart_labels|escapejs }}');
+    const datasets = JSON.parse('{{ chart_datasets|escapejs }}');
 
-new Chart(document.getElementById('priceChart'), {
-    type: 'line',
-    data: { labels, datasets },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false
-    }
-});
+    new Chart(document.getElementById('priceChart'), {
+        type: 'line',
+        data: { labels, datasets },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
 </script>
 
-</body>
-</html>
 {% endblock %}

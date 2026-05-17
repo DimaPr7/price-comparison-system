@@ -4,8 +4,9 @@ from django.contrib.auth.forms import UserCreationForm
 from django.db.models import OuterRef, Subquery
 from django.shortcuts import render, get_object_or_404, redirect
 import json
-
-from .models import Product, PriceHistory
+from django.shortcuts import render, redirect, get_object_or_404
+from .forms import ProfileForm
+from .models import Product, PriceHistory, Profile, Product, Favorite
 
 
 def product_detail(request, product_id):
@@ -113,3 +114,50 @@ def register(request):
 def user_logout(request):
     logout(request)
     return redirect("/")
+
+@login_required
+def profile_view(request):
+    profile, _ = Profile.objects.get_or_create(user=request.user)
+
+    favorites = Favorite.objects.filter(user=request.user).select_related('product')
+
+    return render(request, 'profile.html', {
+        'profile': profile,
+        'favorites': favorites
+    })
+
+@login_required
+def edit_profile(request):
+    profile, _ = Profile.objects.get_or_create(user=request.user)
+
+    if request.method == 'POST':
+        form = ProfileForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save()
+            return redirect('profile')
+    else:
+        form = ProfileForm(instance=profile)
+
+    return render(request, 'edit_profile.html', {'form': form})
+
+@login_required
+def add_to_favorites(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+
+    Favorite.objects.get_or_create(
+        user=request.user,
+        product=product
+    )
+
+    return redirect(request.META.get('HTTP_REFERER', '/'))
+
+@login_required
+def remove_from_favorites(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+
+    Favorite.objects.filter(
+        user=request.user,
+        product=product
+    ).delete()
+
+    return redirect(request.META.get('HTTP_REFERER', '/'))
