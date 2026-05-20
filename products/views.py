@@ -21,7 +21,7 @@ def product_detail(request, product_id):
         last_price=Subquery(last_price_subquery)
     )
 
-    # история для графика
+
     history_qs = (
         PriceHistory.objects
         .filter(offer__product=product)
@@ -78,6 +78,11 @@ def home(request):
         "offers__store",
         "offers__history"
     )
+
+    category = request.GET.get("category")
+
+    if category:
+        products = products.filter(category__name=category)
 
     for product in products:
         min_price = None
@@ -161,3 +166,6 @@ def remove_from_favorites(request, product_id):
     ).delete()
 
     return redirect(request.META.get('HTTP_REFERER', '/'))
+
+def stores(request):
+    return render(request, "stores.html")

@@ -4,162 +4,9 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {% endblock %}
 
-{% block extra_css %}
-<style>
-    .container {
-        max-width: 1100px;
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        gap: 24px;
-        padding: 0 20px 40px;
-        margin-top: 20px;
-    }
-
-    .product-main {
-        display: grid;
-        grid-template-columns: 1fr 2fr;
-        gap: 24px;
-    }
-
-    .card {
-        background: var(--bg-card);
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        box-shadow: var(--shadow);
-        padding: 24px;
-    }
-
-    .product-gallery {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 320px;
-    }
-
-    .product-image {
-        max-width: 100%;
-        max-height: 340px;
-        object-fit: contain;
-    }
-
-    h1 {
-        margin: 0 0 10px;
-        font-size: 2rem;
-    }
-
-    .brand {
-        color: var(--primary);
-        font-size: 0.8rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        margin-bottom: 12px;
-    }
-
-    .description {
-        color: var(--text-muted);
-        line-height: 1.6;
-        margin-bottom: 26px;
-    }
-
-    .offers-list {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .offers-list li {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 14px;
-        background: #f8fafc;
-        border: 1px solid #eef2f7;
-        border-radius: 10px;
-    }
-
-    .offer-info {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-    }
-
-    .price-tag {
-        background: #dcfce7;
-        color: #15803d;
-        padding: 5px 10px;
-        border-radius: 7px;
-        font-weight: 600;
-        font-size: 0.9rem;
-    }
-
-    .no-price {
-        color: var(--text-muted);
-        font-size: 0.9rem;
-    }
-
-    .offer-button {
-        background: var(--primary);
-        color: white;
-        padding: 8px 14px;
-        border-radius: 8px;
-        text-decoration: none;
-        font-size: 0.9rem;
-        font-weight: 500;
-    }
-
-    .offer-button:hover {
-        background: var(--primary-hover);
-    }
-
-    .chart-container {
-        height: 400px;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    th, td {
-        padding: 14px;
-        border-bottom: 1px solid var(--border);
-        text-align: left;
-    }
-
-    th {
-        background: #f8fafc;
-        font-weight: 600;
-    }
-
-    tr:hover td {
-        background: #fafcff;
-    }
-
-    @media (max-width: 900px) {
-        .product-main {
-            grid-template-columns: 1fr;
-        }
-
-        .offers-list li {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-
-        .offer-button {
-            width: 100%;
-            text-align: center;
-        }
-    }
-</style>
-{% endblock %}
-
 {% block content %}
 
-<div class="container">
+<div class="product-page-container">
 
     <div class="product-main">
 
@@ -167,25 +14,26 @@
             {% if product.image %}
                 <img class="product-image" src="{{ product.image.url }}" alt="{{ product.title }}">
             {% else %}
-                <span>No image</span>
+                <span class="no-price">No image</span>
             {% endif %}
         </div>
 
         <div class="card">
-
             <p class="brand">{{ product.brand }}</p>
-
             <h1>{{ product.title }}</h1>
-
             <p class="description">{{ product.description }}</p>
 
-            <h2>💰 Current Prices</h2>
+            <h2>
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                    <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                </svg>
+                Current Prices
+            </h2>
 
             <ul class="offers-list">
-
                 {% for offer in offers %}
                     <li>
-
                         <div class="offer-info">
                             <span>{{ offer.store.name }}</span>
 
@@ -203,72 +51,113 @@
                                 Open offer
                             </a>
                         {% endif %}
-
                     </li>
                 {% endfor %}
-
             </ul>
 
-            <a href="{% url 'add_to_favorites' product.id %}" class="offer-button" style="margin-top:15px; display:inline-block;">
-                ❤️ Add to favorites
+            <a href="{% url 'add_to_favorites' product.id %}" class="offer-button fav-btn">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                </svg>
+                Add to favorites
             </a>
-
         </div>
 
     </div>
 
     <div class="card">
-
-        <h2>📈 Price history chart</h2>
+        <h2>
+            <svg class="icon" viewBox="0 0 24 24">
+                <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
+                <polyline points="16 7 22 7 22 13"></polyline>
+            </svg>
+            Price history chart
+        </h2>
 
         <div class="chart-container">
             <canvas id="priceChart"></canvas>
         </div>
-
     </div>
 
     <div class="card">
+        <h2>
+            <svg class="icon" viewBox="0 0 24 24">
+                <line x1="8" y1="6" x2="21" y2="6"></line>
+                <line x1="8" y1="12" x2="21" y2="12"></line>
+                <line x1="8" y1="18" x2="21" y2="18"></line>
+                <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                <line x1="3" y1="18" x2="3.01" y2="18"></line>
+            </svg>
+            History
+        </h2>
 
-        <h2>📊 History</h2>
-
-        <table>
-
-            <thead>
-                <tr>
-                    <th>Store</th>
-                    <th>Price</th>
-                    <th>Date</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                {% for h in history %}
+        <div class="history-table-wrapper">
+            <table>
+                <thead>
                     <tr>
-                        <td>{{ h.offer.store.name }}</td>
-                        <td>{{ h.price }} €</td>
-                        <td>{{ h.recorded_at }}</td>
+                        <th>Store</th>
+                        <th>Price</th>
+                        <th>Date</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-
-        </table>
-
+                </thead>
+                <tbody>
+                    {% for h in history|slice:":30" %}
+                        <tr>
+                            <td>{{ h.offer.store.name }}</td>
+                            <td style="color: var(--accent-green); font-weight: 600;">
+                                {{ h.price }} €
+                            </td>
+                            <td style="color: var(--text-muted);">
+                                {{ h.recorded_at }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 
 </div>
 
 <script>
-    const labels = JSON.parse('{{ chart_labels|escapejs }}');
-    const datasets = JSON.parse('{{ chart_datasets|escapejs }}');
+document.addEventListener("DOMContentLoaded", function () {
+    try {
+        const labels = JSON.parse('{{ chart_labels|escapejs }}');
+        const datasets = JSON.parse('{{ chart_datasets|escapejs }}');
 
-    new Chart(document.getElementById('priceChart'), {
-        type: 'line',
-        data: { labels, datasets },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false
+        if (labels && datasets && labels.length > 0) {
+            new Chart(document.getElementById('priceChart'), {
+                type: 'line',
+                data: { labels, datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: false,
+                    spanGaps: true,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                boxWidth: 12,
+                                font: { family: 'Inter' }
+                            }
+                        }
+                    },
+                    elements: {
+                        line: { tension: 0, borderWidth: 2 },
+                        point: { radius: labels.length > 30 ? 0 : 3 }
+                    },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: { grid: { color: '#eef1f4' } }
+                    }
+                }
+            });
         }
-    });
+    } catch (e) {
+        console.error("Chart error:", e);
+    }
+});
 </script>
 
 {% endblock %}
