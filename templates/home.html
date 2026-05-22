@@ -28,13 +28,16 @@
                     </div>
 
                     <div class="price-box">
-                        {% if product.min_price_value %}
-                            <div class="price-amount">{{ product.min_price_value }} €</div>
-                            <div class="store-name">{{ product.min_price_store }}</div>
-                        {% else %}
-                            <div class="no-price">No offers yet</div>
-                        {% endif %}
-                    </div>
+    {% if product.min_price_value %}
+        <div class="price-amount">
+            <span class="price-prefix">From</span>
+            {{ product.min_price_value }} €
+        </div>
+        <div class="store-name">in {{ product.min_price_store }}</div>
+    {% else %}
+        <div class="no-price">No offers yet</div>
+    {% endif %}
+</div>
 
                 </div>
             </a>

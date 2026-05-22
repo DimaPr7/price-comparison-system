@@ -1,18 +1,18 @@
 from django.contrib.auth import login as auth_login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
-from django.db.models import OuterRef, Subquery
+from django.db.models import OuterRef, Subquery, Q
 from django.shortcuts import render, get_object_or_404, redirect
+
 import json
-from django.shortcuts import render, redirect, get_object_or_404
+
 from .forms import ProfileForm
-from .models import Product, PriceHistory, Profile, Product, Favorite
+from .models import Product, PriceHistory, Profile, Favorite
 
 
 def product_detail(request, product_id):
     product = get_object_or_404(Product, id=product_id)
 
-    # 🔥 последняя цена по каждому offer
     last_price_subquery = PriceHistory.objects.filter(
         offer=OuterRef("pk")
     ).order_by("-recorded_at").values("price")[:1]
@@ -21,12 +21,11 @@ def product_detail(request, product_id):
         last_price=Subquery(last_price_subquery)
     )
 
-
     history_qs = (
         PriceHistory.objects
         .filter(offer__product=product)
         .select_related("offer", "offer__store")
-        .order_by("recorded_at")
+        .order_by("-recorded_at")
     )
 
     store_data = {}
@@ -80,9 +79,16 @@ def home(request):
     )
 
     category = request.GET.get("category")
+    q = request.GET.get("q", "").strip()
 
     if category:
         products = products.filter(category__name=category)
+
+    if q:
+        products = products.filter(
+            Q(title__icontains=q) |
+            Q(brand__icontains=q)
+        )
 
     for product in products:
         min_price = None
@@ -120,30 +126,32 @@ def user_logout(request):
     logout(request)
     return redirect("/")
 
+
 @login_required
 def profile_view(request):
     profile, _ = Profile.objects.get_or_create(user=request.user)
+    favorites = Favorite.objects.filter(user=request.user).select_related("product")
 
-    favorites = Favorite.objects.filter(user=request.user).select_related('product')
-
-    return render(request, 'profile.html', {
-        'profile': profile,
-        'favorites': favorites
+    return render(request, "profile.html", {
+        "profile": profile,
+        "favorites": favorites
     })
+
 
 @login_required
 def edit_profile(request):
     profile, _ = Profile.objects.get_or_create(user=request.user)
 
-    if request.method == 'POST':
+    if request.method == "POST":
         form = ProfileForm(request.POST, request.FILES, instance=profile)
         if form.is_valid():
             form.save()
-            return redirect('profile')
+            return redirect("profile")
     else:
         form = ProfileForm(instance=profile)
 
-    return render(request, 'edit_profile.html', {'form': form})
+    return render(request, "edit_profile.html", {"form": form})
+
 
 @login_required
 def add_to_favorites(request, product_id):
@@ -154,7 +162,8 @@ def add_to_favorites(request, product_id):
         product=product
     )
 
-    return redirect(request.META.get('HTTP_REFERER', '/'))
+    return redirect(request.META.get("HTTP_REFERER", "/"))
+
 
 @login_required
 def remove_from_favorites(request, product_id):
@@ -165,16 +174,20 @@ def remove_from_favorites(request, product_id):
         product=product
     ).delete()
 
-    return redirect(request.META.get('HTTP_REFERER', '/'))
+    return redirect(request.META.get("HTTP_REFERER", "/"))
+
 
 def stores(request):
     return render(request, "stores.html")
 
+
 def contacts(request):
     return render(request, "contacts.html")
 
+
 def privacy_policy(request):
     return render(request, "privacy_policy.html")
+
 
 def terms_of_use(request):
     return render(request, "terms_of_use.html")
