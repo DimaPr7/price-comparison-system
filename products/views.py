@@ -169,3 +169,12 @@ def remove_from_favorites(request, product_id):
 
 def stores(request):
     return render(request, "stores.html")
+
+def contacts(request):
+    return render(request, "contacts.html")
+
+def privacy_policy(request):
+    return render(request, "privacy_policy.html")
+
+def terms_of_use(request):
+    return render(request, "terms_of_use.html")
