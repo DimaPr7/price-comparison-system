@@ -1,164 +1,5 @@
 {% extends "base.html" %}
 
-{% block extra_head %}
-<style>
-    .profile-page-wrapper {
-        display: grid;
-        grid-template-columns: 260px 1fr;
-        gap: 32px;
-        align-items: start;
-        margin-top: 20px;
-    }
-
-    .profile-info-card {
-        background: var(--bg-card);
-        border: 1px solid var(--border);
-        padding: 24px;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .profile-info-block h1 {
-        font-size: 1.3rem;
-        font-weight: 800;
-        margin: 0 0 4px 0;
-        line-height: 1.2;
-    }
-
-    .profile-info-block p {
-        color: var(--text-muted);
-        margin: 0 0 20px 0;
-        font-size: 0.9rem;
-        font-weight: 500;
-    }
-
-    .profile-action-btn {
-        display: block;
-        width: 100%;
-        text-align: center;
-        background: transparent;
-        color: var(--text-main) !important;
-        border: 1px solid var(--border);
-        padding: 10px;
-        font-size: 0.85rem;
-        font-weight: 600;
-        text-decoration: none;
-        transition: background 0.1s ease;
-    }
-
-    .profile-action-btn:hover {
-        background: #eef1f4;
-        border-color: var(--border-hover);
-    }
-
-    .favorites-section-title {
-        font-size: 1.4rem;
-        font-weight: 800;
-        margin-top: 0;
-        margin-bottom: 24px;
-        padding-bottom: 12px;
-        border-bottom: 1px solid var(--border);
-    }
-
-    .fav-products-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-        gap: 24px;
-    }
-
-    .fav-product-card {
-        background: var(--bg-card);
-        border: 1px solid var(--border);
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-    }
-
-    .fav-image-wrapper {
-        width: 100%;
-        height: 160px;
-        background: #ffffff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-        border-bottom: 1px solid var(--border);
-    }
-
-    .fav-image-wrapper img {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-        padding: 8px;
-    }
-
-    .fav-content-block {
-        padding: 16px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        flex-grow: 1;
-    }
-
-    .fav-product-title {
-        font-size: 0.95rem;
-        font-weight: 700;
-        margin-bottom: 16px;
-        line-height: 1.3;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        height: 2.6em;
-    }
-
-    .fav-buttons-group {
-        display: flex;
-        gap: 8px;
-        margin-top: auto;
-    }
-
-    .fav-open-btn {
-        flex: 1;
-        background: #475d73;
-        color: #ffffff !important;
-        border: 1px solid #475d73;
-        padding: 8px;
-        font-size: 0.8rem;
-        font-weight: 700;
-        text-decoration: none;
-        text-align: center;
-    }
-
-    .fav-open-btn:hover {
-        background: var(--primary);
-        border-color: var(--primary);
-    }
-
-    .fav-remove-btn {
-        background: transparent;
-        color: #dc2626 !important;
-        border: 1px solid #fee2e2;
-        padding: 8px 12px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        text-decoration: none;
-        text-align: center;
-    }
-
-    .fav-remove-btn:hover {
-        background: #fef2f2;
-        border-color: #fca5a5;
-    }
-
-    @media (max-width: 768px) {
-        .profile-page-wrapper {
-            grid-template-columns: 1fr;
-        }
-    }
-</style>
-{% endblock %}
-
 {% block content %}
 
 <div class="profile-page-wrapper">
@@ -198,16 +39,11 @@
                     <div class="fav-image-wrapper">
 
                         {% if fav.product.image %}
-
                             <img src="{{ fav.product.image.url }}">
-
                         {% else %}
-
-                            <div class="no-photo"
-                                 style="font-size:0.8rem; font-weight:600; color:var(--text-muted);">
+                            <div class="no-photo">
                                 NO IMAGE
                             </div>
-
                         {% endif %}
 
                     </div>
@@ -238,11 +74,8 @@
 
             {% empty %}
 
-                <div class="empty-message"
-                     style="grid-column: 1 / -1; padding: 40px 0; color: var(--text-muted);">
-
+                <div class="empty-message">
                     No favorites yet.
-
                 </div>
 
             {% endfor %}
