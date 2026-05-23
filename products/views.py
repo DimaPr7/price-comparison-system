@@ -53,6 +53,12 @@ def login_view(request):
 
 def product_detail(request, product_id):
     product = get_object_or_404(Product, id=product_id)
+    is_favorite = False
+    if request.user.is_authenticated:
+        is_favorite = Favorite.objects.filter(
+            user=request.user,
+            product=product
+        ).exists()
 
     last_price_subquery = PriceHistory.objects.filter(
         offer=OuterRef("pk")
@@ -110,6 +116,8 @@ def product_detail(request, product_id):
         "history": history_qs,
         "chart_labels": json.dumps(all_dates),
         "chart_datasets": json.dumps(datasets),
+
+        "is_favorite": is_favorite,
     })
 
 
