@@ -1,13 +1,54 @@
-from django.contrib.auth import login as auth_login, logout
+from django.contrib.auth import login as auth_login, logout, authenticate
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.models import User
 from django.db.models import OuterRef, Subquery, Q
 from django.shortcuts import render, get_object_or_404, redirect
 
 import json
 
-from .forms import ProfileForm
-from .models import Product, PriceHistory, Profile, Favorite
+from .forms import UserEditForm, RegisterForm, EmailLoginForm
+from .models import Product, PriceHistory, Favorite
+
+def register(request):
+
+    if request.method == "POST":
+        form = RegisterForm(request.POST)
+
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.email = form.cleaned_data["email"]
+            user.save()
+            return redirect("login")
+
+    else:
+        form = RegisterForm()
+
+    return render(request, "registration/register.html", {
+        "form": form
+    })
+
+def login_view(request):
+
+    form = EmailLoginForm(request.POST or None)
+
+    if request.method == "POST":
+
+        if form.is_valid():
+
+            login_input = form.cleaned_data["username"]
+            password = form.cleaned_data["password"]
+            user = User.objects.filter(email=login_input).first()
+            if not user:
+                user = User.objects.filter(username=login_input).first()
+
+            if user and user.check_password(password):
+                auth_login(request, user)
+                return redirect("home")
+
+            form.add_error(None, "Invalid email or password")
+
+    return render(request, "registration/login.html", {"form": form})
 
 
 def product_detail(request, product_id):
@@ -109,18 +150,6 @@ def home(request):
     return render(request, "home.html", {"products": products})
 
 
-def register(request):
-    if request.method == "POST":
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            auth_login(request, user)
-            return redirect("home")
-    else:
-        form = UserCreationForm()
-
-    return render(request, "registration/register.html", {"form": form})
-
 
 def user_logout(request):
     logout(request)
@@ -129,28 +158,34 @@ def user_logout(request):
 
 @login_required
 def profile_view(request):
-    profile, _ = Profile.objects.get_or_create(user=request.user)
-    favorites = Favorite.objects.filter(user=request.user).select_related("product")
+
+    favorites = Favorite.objects.filter(
+        user=request.user
+    ).select_related("product")
 
     return render(request, "profile.html", {
-        "profile": profile,
         "favorites": favorites
     })
 
-
 @login_required
 def edit_profile(request):
-    profile, _ = Profile.objects.get_or_create(user=request.user)
 
-    if request.method == "POST":
-        form = ProfileForm(request.POST, request.FILES, instance=profile)
+    if request.method == 'POST':
+        form = UserEditForm(
+            request.POST,
+            instance=request.user
+        )
+
         if form.is_valid():
             form.save()
-            return redirect("profile")
-    else:
-        form = ProfileForm(instance=profile)
+            return redirect('profile')
 
-    return render(request, "edit_profile.html", {"form": form})
+    else:
+        form = UserEditForm(instance=request.user)
+
+    return render(request, 'edit_profile.html', {
+        'form': form
+    })
 
 
 @login_required
@@ -175,7 +210,6 @@ def remove_from_favorites(request, product_id):
     ).delete()
 
     return redirect(request.META.get("HTTP_REFERER", "/"))
-
 
 def stores(request):
     return render(request, "stores.html")
