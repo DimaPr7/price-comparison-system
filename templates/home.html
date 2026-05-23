@@ -19,11 +19,11 @@
                         <h3>{{ product.title }}</h3>
 
                         <div class="image-wrapper">
-                            {% if product.image %}
-                                <img src="{{ product.image.url }}" alt="{{ product.title }}">
-                            {% else %}
-                                <div class="no-photo">No image</div>
-                            {% endif %}
+                            {% if product.image_url %}
+    <img src="{{ product.image_url }}" alt="{{ product.title }}">
+{% else %}
+    <span>No image</span>
+{% endif %}
                         </div>
                     </div>
 

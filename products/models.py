@@ -30,7 +30,7 @@ class Product(models.Model):
         related_name='products'
     )
 
-    image = models.ImageField(upload_to='products/', null=True, blank=True)
+    image_url = models.URLField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

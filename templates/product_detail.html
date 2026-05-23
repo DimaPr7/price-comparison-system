@@ -11,11 +11,11 @@
     <div class="product-main">
 
         <div class="card product-gallery">
-            {% if product.image %}
-                <img class="product-image" src="{{ product.image.url }}" alt="{{ product.title }}">
-            {% else %}
-                <span class="no-price">No image</span>
-            {% endif %}
+            {% if product.image_url %}
+    <img src="{{ product.image_url }}" alt="{{ product.title }}">
+{% else %}
+    <span>No image</span>
+{% endif %}
         </div>
 
         <div class="card">
