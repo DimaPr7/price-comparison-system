@@ -38,13 +38,13 @@
 
                     <div class="fav-image-wrapper">
 
-                        {% if fav.product.image %}
-                            <img src="{{ fav.product.image_url }}">
-                        {% else %}
-                            <div class="no-photo">
-                                NO IMAGE
-                            </div>
-                        {% endif %}
+                        {% if fav.product.image_url %}
+    <img src="{{ fav.product.image_url }}" alt="{{ fav.product.title }}">
+{% else %}
+    <div class="no-photo">
+        NO IMAGE
+    </div>
+{% endif %}
 
                     </div>
 
