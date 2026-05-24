@@ -9,7 +9,7 @@
         <div class="profile-info-block">
 
             <h1>
-                {{ profile.name|default:request.user.username }}
+                {{ request.user.email }}
             </h1>
 
             <p>
