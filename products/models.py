@@ -22,7 +22,6 @@ class Product(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     brand = models.CharField(max_length=255, blank=True)
-    url = models.URLField(blank=True)
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
@@ -40,7 +39,6 @@ class Product(models.Model):
 class Store(models.Model):
     name = models.CharField(max_length=255)
     website_url = models.URLField(blank=True)
-    logo = models.ImageField(upload_to='stores/', null=True, blank=True)
 
     def __str__(self):
         return self.name
