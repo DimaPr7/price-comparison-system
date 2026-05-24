@@ -9,11 +9,11 @@
         <div class="profile-info-block">
 
             <h1>
-                {{ request.user.username }}
+                @{{ request.user.username }}
             </h1>
 
             <p>
-                @{{ request.user.email }}
+                {{ request.user.email }}
             </p>
 
             <a href="{% url 'edit_profile' %}" class="profile-action-btn">
