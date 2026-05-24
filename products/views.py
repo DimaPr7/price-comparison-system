@@ -219,8 +219,14 @@ def remove_from_favorites(request, product_id):
 
     return redirect(request.META.get("HTTP_REFERER", "/"))
 
+from .models import Store
+
 def stores(request):
-    return render(request, "stores.html")
+    stores = Store.objects.all()
+
+    return render(request, "stores.html", {
+        "stores": stores
+    })
 
 
 def contacts(request):

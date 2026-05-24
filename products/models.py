@@ -39,6 +39,7 @@ class Product(models.Model):
 class Store(models.Model):
     name = models.CharField(max_length=255)
     website_url = models.URLField(blank=True)
+    logo_url = models.URLField(blank=True)
 
     def __str__(self):
         return self.name

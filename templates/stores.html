@@ -8,21 +8,17 @@
 
     <div class="stores-grid">
 
-        <a href="https://pigu.lt/lt/" class="store-card">
-            <img src="https://upload.wikimedia.org/wikipedia/lt/0/0a/Pigu.lt_logotipas.png?_=20170325093645" alt="Pigu">
-        </a>
+        {% for store in stores %}
+            <a href="{{ store.website_url }}" class="store-card" target="_blank">
 
-        <a href="https://www.bite.lt/" class="store-card">
-            <img src="https://upload.wikimedia.org/wikipedia/lt/thumb/3/32/Bit%C4%97_logo_2019.svg/960px-Bit%C4%97_logo_2019.svg.png?_=20221030115022" alt="Bite">
-        </a>
+                {% if store.logo_url %}
+                    <img src="{{ store.logo_url }}" alt="{{ store.name }}">
+                {% else %}
+                    <span>{{ store.name }}</span>
+                {% endif %}
 
-        <a href="https://www.telia.lt/privatiems" class="store-card">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Telia_logo_2022.svg/1280px-Telia_logo_2022.svg.png?_=20220318123359" alt="Telia">
-        </a>
-
-        <a href="https://www.senukai.lt/" class="store-card">
-            <img src="https://cdn.freebiesupply.com/logos/large/2x/senukai-logo-png-transparent.png" alt="Senukai">
-        </a>
+            </a>
+        {% endfor %}
 
     </div>
 
